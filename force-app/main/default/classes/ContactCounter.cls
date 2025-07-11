@@ -58,7 +58,7 @@ public with sharing class ContactCounter {
   }
 
   public class FlowInput {
-    @InvocableVariable
+    @InvocableVariable(required=true)
     public List<Contact> contacts;
   }
   public class FlowOutput {
