@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Maximum_Number_of_Contacts</fullName>
+    <active>false</active>
+    <errorConditionFormula>Number_of_Contacts__c &gt; 5</errorConditionFormula>
+    <errorMessage>Contacts &gt; 5</errorMessage>
+</ValidationRule>
