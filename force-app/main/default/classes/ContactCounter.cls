@@ -3,7 +3,7 @@
  */
 public with sharing class ContactCounter {
   /**
-   * @description Creates a list of contact count Objects from contact list.
+   * @description Creates a list of Contact Count Objects from Contact List.
    */
   public static List<Contact_Count__c> getContactCounts(
     List<Contact> contacts

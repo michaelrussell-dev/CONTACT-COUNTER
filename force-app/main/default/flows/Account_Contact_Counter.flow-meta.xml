@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <actionCalls>
+        <description>Pass in the list of retreived Contacts and a list of Contact Count wil be returned. Populate datatable etc.</description>
         <name>Contact_Count_Action</name>
         <label>Contact Count Action</label>
         <locationX>0</locationX>
@@ -8,7 +9,7 @@
         <actionName>ContactCounter</actionName>
         <actionType>apex</actionType>
         <connector>
-            <targetReference>Screen_1</targetReference>
+            <targetReference>Selection_Screen</targetReference>
         </connector>
         <flowTransactionModel>Automatic</flowTransactionModel>
         <inputParameters>
@@ -27,24 +28,26 @@
     <apiVersion>64.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
-        <name>Selected_Rows_assignment</name>
-        <label>Selected Rows</label>
+        <description>This step was required to enable using UID field in upsert criteria as it wasnt available from the data table result directly ?</description>
+        <name>Add_Selects_to_Contact_Counts</name>
+        <label>Add Selects to Contact Counts</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <assignmentItems>
             <assignToReference>contactCounts</assignToReference>
             <operator>Assign</operator>
             <value>
-                <elementReference>dt.selectedRows</elementReference>
+                <elementReference>selection_datatable.selectedRows</elementReference>
             </value>
         </assignmentItems>
         <connector>
-            <targetReference>Create_Records_1</targetReference>
+            <targetReference>Contact_Counts</targetReference>
         </connector>
     </assignments>
     <assignments>
-        <name>Set_State_List</name>
-        <label>Set State List</label>
+        <description>As states are stored in text field on Contact the state list is used for validation / criteria.</description>
+        <name>Construct_State_List</name>
+        <label>Construct State List</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <assignmentItems>
@@ -107,12 +110,13 @@
         </value>
     </customProperties>
     <decisions>
+        <description>Check Account has eligible Contacts to count. If contacts (populated from Get Contact is not Empty then eligible contacts where found. Else no contacts path.</description>
         <name>Has_Contacts</name>
         <label>Has Contacts</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <defaultConnector>
-            <targetReference>No_Contacts</targetReference>
+            <targetReference>No_Contacts_screen</targetReference>
         </defaultConnector>
         <defaultConnectorLabel>no contacts</defaultConnectorLabel>
         <rules>
@@ -154,8 +158,9 @@
     </processMetadataValues>
     <processType>Flow</processType>
     <recordCreates>
-        <name>Create_Records_1</name>
-        <label>Create Records 1</label>
+        <description>Upsert Selected Contact Counts</description>
+        <name>Contact_Counts</name>
+        <label>Contact Counts</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <doesUpsert>true</doesUpsert>
@@ -166,6 +171,7 @@
         <upsertExternalIdField>UID__c</upsertExternalIdField>
     </recordCreates>
     <recordLookups>
+        <description>Get Account Contacts where Type and Department (State) are populated and contained in stateList.</description>
         <name>Get_Contacts</name>
         <label>Get Contacts</label>
         <locationX>0</locationX>
@@ -246,7 +252,7 @@
         <showHeader>true</showHeader>
     </screens>
     <screens>
-        <name>No_Contacts</name>
+        <name>No_Contacts_screen</name>
         <label>No Contacts</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
@@ -255,7 +261,7 @@
         <allowPause>false</allowPause>
         <fields>
             <name>no_contacts_text</name>
-            <fieldText>&lt;p&gt;No Contacts Found!&lt;/p&gt;</fieldText>
+            <fieldText>&lt;p&gt;No Contacts Found! (or no contacts that meet criteria to be counted found).&lt;/p&gt;</fieldText>
             <fieldType>DisplayText</fieldType>
             <styleProperties>
                 <verticalAlignment>
@@ -270,18 +276,18 @@
         <showHeader>true</showHeader>
     </screens>
     <screens>
-        <name>Screen_1</name>
-        <label>Screen 1</label>
+        <name>Selection_Screen</name>
+        <label>Selection Screen</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <allowBack>true</allowBack>
         <allowFinish>true</allowFinish>
-        <allowPause>true</allowPause>
+        <allowPause>false</allowPause>
         <connector>
-            <targetReference>Selected_Rows_assignment</targetReference>
+            <targetReference>Add_Selects_to_Contact_Counts</targetReference>
         </connector>
         <fields>
-            <name>dt</name>
+            <name>selection_datatable</name>
             <dataTypeMappings>
                 <typeName>T</typeName>
                 <typeValue>Contact_Count__c</typeValue>
@@ -291,7 +297,7 @@
             <inputParameters>
                 <name>label</name>
                 <value>
-                    <stringValue>Data Table</stringValue>
+                    <stringValue>Selection Data Table</stringValue>
                 </value>
             </inputParameters>
             <inputParameters>
@@ -343,7 +349,7 @@
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Set_State_List</targetReference>
+            <targetReference>Construct_State_List</targetReference>
         </connector>
     </start>
     <status>Active</status>
